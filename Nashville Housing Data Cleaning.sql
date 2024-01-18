@@ -6,7 +6,7 @@ FROM dbo.nhp;
 
 
 
---Standardized date format. The sale date column had useless information that would not help in gathering insights
+--Standardized date format. The sale date column had useless information that would not help in gathering insights. Such as time of day that the sale was made. For the purposes of this analysis it is not needed. 
 
 SELECT saledate1 , CONVERT(Date , SaleDate)
 FROM dbo.nhp
@@ -21,13 +21,13 @@ UPDATE dbo.nhp
 SET saledate1 = CONVERT(Date , SaleDate);
 
 
---Removing a duplicate column 'SaleDate'. I created new columns that converted the data to be more useful for analysis. 
+-- Removing a duplicate column 'SaleDate'. I created new columns that converted the data to be more useful for analysis and do not have a need to have two of the same columns.
 
 ALTER TABLE dbo.nhp
 DROP COLUMN SaleDate;
 
 
---Property address data. Here is where i joined the same table together so the proeprty addresses for duplicate values would be the same and not be a NULL value.
+-- Property address data. Here is where i joined the same table together so the proeprty addresses for duplicate values would be the same and not be a NULL value.
 
 SELECT *
 FROM dbo.nhp
@@ -49,8 +49,8 @@ ON a.ParcelID = b.ParcelID
 	AND a.UniqueID <> b.UniqueID
 WHERE a.PropertyAddress IS NULL;
 
---Seperating address into individual columns (address , city , state) using the substring code. This allows the data to be more useful in gathering insights rather than having all that information in one column.
---Substring can be more time consuming but I wanted to practice different ways of writing code and getting the same results.
+-- Seperating address into individual columns (address , city , state) using the substring code. This allows the data to be more useful in gathering insights rather than having all that information in one column.
+-- Substring can be more time consuming but I wanted to practice different ways of writing code and getting the same results.
 
 
 SELECT PropertyAddress
@@ -74,7 +74,7 @@ ADD city NVARCHAR(255);
 UPDATE dbo.nhp
 SET city = SUBSTRING(PropertyAddress , CHARINDEX(',' , PropertyAddress) + 1 , LEN(PropertyAddress))
 
---I will check to make sure changes have been made and then remove 'PropertyAddress' column from dataset
+-- I will check to make sure changes have been made and then remove 'PropertyAddress' column from dataset
 -- Having multiple columns with the same data will take up space in the query and cause confusion later on.
 
 SELECT *
@@ -83,7 +83,7 @@ FROM dbo.nhp;
 ALTER TABLE dbo.nhp
 DROP COLUMN PropertyAddress;
 
---Seperating OwnerAddress data using PARSENAME (it will look for '.' not ','). Additionally it starts from the end of the code, so for this example specifically I had to start with 3 instead of 1
+-- Seperating OwnerAddress data using PARSENAME (it will look for '.' not ','). Additionally it starts from the end of the code, so for this example specifically I had to start with 3 instead of 1
 
 SELECT
 	PARSENAME(REPLACE(OwnerAddress , ',' , '.') , 3)
